@@ -7,9 +7,12 @@ import KitchenPage from './User/pages/Kitchen.jsx'
 import Search from './User/pages/Search.jsx' 
 import CartPage from './User/pages/Cart.jsx'
 import PaymentPage from './User/pages/Payment.jsx'
+import { CartProvider } from "./User/context/cartContext.jsx";
+import {OrderPlaced} from "./User/pages/OrderPlaced.jsx";
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+      <CartProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />}>
@@ -19,7 +22,9 @@ createRoot(document.getElementById('root')).render(
         <Route path="/kitchen/:slug" element={<KitchenPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/order-placed" element={<OrderPlaced />} />
       </Routes>
     </BrowserRouter>
+    </CartProvider>
   </StrictMode>
 )

@@ -3,7 +3,7 @@ export default function CartItem({ name, quantity, price, image }) {
     <div className="flex items-center justify-between py-3">
       <div className="flex items-center gap-4">
         <img
-          src={image || "/placeholder.svg"}
+          src={image || "/assorted-food-bowl.png "}
           alt={`${name} thumbnail`}
           width={56}
           height={56}
