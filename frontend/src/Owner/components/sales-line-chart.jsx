@@ -1,4 +1,3 @@
-"use client"
 
 import { ResponsiveContainer, LineChart, Line, XAxis, CartesianGrid, Tooltip } from "recharts"
 import { Card } from "@/components/ui/card"
