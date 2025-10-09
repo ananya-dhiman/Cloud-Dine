@@ -1,4 +1,4 @@
-import SimpleNav from "../components/simple-nav "
+import SimpleNav from "../components/simple-nav"
 import DishCard from "../components/dish-card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"

@@ -22,10 +22,10 @@ export default function SimpleNav() {
           className="flex items-center gap-2 font-semibold tracking-tight"
         >
           <img
-            src="/images/cloud-dine-logo.png"
+            src="/images/logo.png"
             alt="Cloud Dine logo"
-            width={28}
-            height={28}
+            width={36}
+            height={36}
             className="h-7 w-7"
           />
           <span className="text-base">Cloud Dine</span>
@@ -35,7 +35,7 @@ export default function SimpleNav() {
         <ul className="flex items-center gap-4 md:gap-6">
           <li>
             <Link
-              to="/dashboard"
+              to="/owner"
               aria-label="Dashboard"
               className="rounded-md p-2 hover:bg-muted"
             >
@@ -45,7 +45,7 @@ export default function SimpleNav() {
           </li>
           <li>
             <Link
-              to="/menu"
+              to="/owner/menu"
               aria-label="Menu"
               className="rounded-md p-2 hover:bg-muted"
             >
@@ -55,7 +55,7 @@ export default function SimpleNav() {
           </li>
           <li>
             <Link
-              to="/orders"
+              to="/owner/orders"
               aria-label="Orders"
               className="rounded-md p-2 hover:bg-muted"
             >
@@ -65,7 +65,7 @@ export default function SimpleNav() {
           </li>
           <li>
             <Link
-              to="/onboarding"
+              to="/owner/onboarding"
               aria-label="Edit Form"
               className="rounded-md p-2 hover:bg-muted"
             >

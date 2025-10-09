@@ -1,6 +1,6 @@
 
 
-import { ResponsiveContainer, BarChart, Bar, XAxis, CartesianGrid, Tooltip } from "recharts"
+import { ResponsiveContainer, BarChart, Bar, XAxis, CartesianGrid, Tooltip } from "recharts";
 import { Card } from "@/components/ui/card"
 
 const data = [

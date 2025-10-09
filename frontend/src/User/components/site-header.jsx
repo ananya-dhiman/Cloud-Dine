@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import logo from '../../../public/images/logo.png';
+
 
 export default function SiteHeader() {
   return (
@@ -10,7 +10,7 @@ export default function SiteHeader() {
 
     <Link to="/" className="flex items-center gap-2">
       <img 
-        src={logo} 
+        src="/images/logo.png"
         alt="CloudKitchen Logo" 
         className="h-6 w-6 object-contain"  // tweak size as needed
       />

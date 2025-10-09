@@ -1,7 +1,7 @@
-import SimpleNav from "../components/simple-nav "
-import StatCard from "@/components/dashboard/stat-card"
-import SalesLineChart from "@/components/dashboard/sales-line-chart"
-import OrdersBarChart from "@/components/dashboard/orders-bar-chart"
+import SimpleNav from "../components/simple-nav"
+import StatCard from "../components/stat-card"
+import SalesLineChart from "../components/sales-line-chart"
+import OrdersBarChart from "../components/orders-bar-chart"
 
 export default function DashboardPage() {
   return (

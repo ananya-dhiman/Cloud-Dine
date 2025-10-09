@@ -12,7 +12,7 @@ import {OrderPlaced} from "./User/pages/OrderPlaced.jsx";
 
 //Owner
 import DashboardPage from './Owner/pages/dashboard.jsx'   
-import OrdersPage from './Owner/pages/order.jsx'
+import OrdersPage from './Owner/pages/orders.jsx'
 import MenuManagementPage from './Owner/pages/menu.jsx'
 import OnboardingPage from './Owner/pages/onboarding'
 
