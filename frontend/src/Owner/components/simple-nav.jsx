@@ -24,9 +24,8 @@ export default function SimpleNav() {
           <img
             src="/images/logo.png"
             alt="Cloud Dine logo"
-            width={36}
-            height={36}
-            className="h-7 w-7"
+          
+            className="h-15 w-23"
           />
           <span className="text-base">Cloud Dine</span>
         </Link>

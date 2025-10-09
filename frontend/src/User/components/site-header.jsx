@@ -11,10 +11,10 @@ export default function SiteHeader() {
     <Link to="/" className="flex items-center gap-2">
       <img 
         src="/images/logo.png"
-        alt="CloudKitchen Logo" 
+        alt="CloudDine Logo" 
         className="h-6 w-6 object-contain"  // tweak size as needed
       />
-      <span className="font-semibold tracking-tight">CloudKitchen</span>
+      <span className="font-semibold tracking-tight">CloudDine</span>
     </Link>
 
 

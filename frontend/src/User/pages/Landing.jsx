@@ -79,14 +79,14 @@ export default function LandingPage() {
               name: "Sarah L.",
               role: "Food Blogger",
               quote:
-                "The food from CloudKitchen is always fresh, delicious, and delivered right on time. Their selection is fantastic!",
+                "The food from CloudDine is always fresh, delicious, and delivered right on time. Their selection is fantastic!",
             },
             {
                image:"/images/portrait-sophia.jpg",
               name: "Mike P.",
               role: "Busy Professional",
               quote:
-                "With a hectic schedule, CloudKitchen has been a lifesaver. I get high‑quality meals without the hassle of cooking.",
+                "With a hectic schedule, CloudDine has been a lifesaver. I get high‑quality meals without the hassle of cooking.",
             },
             
             {
@@ -123,7 +123,7 @@ export default function LandingPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-sm bg-primary" aria-hidden />
-              <span className="font-semibold">CloudKitchen</span>
+              <span className="font-semibold">CloudDine</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
               Our mission is to bring you a diverse range of culinary experiences, prepared with the freshest
@@ -161,7 +161,7 @@ export default function LandingPage() {
         </div>
         <div className="border-t py-6">
           <p className="mx-auto max-w-6xl px-4 text-sm text-muted-foreground">
-            © 2025 CloudKitchen. All Rights Reserved.
+            © 2025 CloudDine. All Rights Reserved.
           </p>
         </div>
       </footer>
