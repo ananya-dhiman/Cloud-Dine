@@ -15,25 +15,25 @@ export default function SearchPage() {
       href: "/kitchen/spice-merchant",
       title: "The Spice Merchant",
       description: "Authentic Indian cuisine with a focus on hygiene. Rated 4.5 stars.",
-      image: "/indian-curry-and-rice.jpg",
+      image: "/images/chicken-biryani-bowl.jpg",
     },
     {
       href: "/kitchen/pasta-paradise",
       title: "Pasta Paradise",
       description: "Italian dishes made with fresh ingredients. Verified kitchen. Rated 4.2 stars.",
-      image: "/italian-pasta-stack.jpg",
+      image: "/images/pasta.png",
     },
     {
       href: "/kitchen/sushi-central",
       title: "Sushi Central",
       description: "Fresh sushi and Japanese cuisine. High hygiene standards. Rated 4.8 stars.",
-      image: "/sushi-assortment.png",
+      image: "/images/sushi-assortment.png",
     },
     {
       href: "/kitchen/burger-barn",
       title: "Burger Barn",
       description: "Gourmet burgers and sides. Verified for cleanliness. Rated 4.0 stars.",
-      image: "/gourmet-burger.png",
+      image: "/images/burger1.png",
     },
   ]
 
