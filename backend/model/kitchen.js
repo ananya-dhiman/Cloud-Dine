@@ -48,7 +48,6 @@
         },
 
         
-        // 📷 Photos: owner + admin verification
         photos: {
         ownerSubmitted: [
             {
@@ -97,21 +96,5 @@
     { timestamps: true }
     );
 
-    kitchenSchema.pre("save", function (next) {
-    const v = this.verification;
-    if (
-        v.hygieneStandardsMet &&
-        v.foodCertificationsValid &&
-        v.equipmentConditionGood &&
-        v.addressVerified &&
-        v.photoVerification
-    ) {
-        v.verified = true;
-        v.verifiedAt = new Date();
-    } else {
-        v.verified = false;
-    }
-    next();
-    });
 
     export default mongoose.model("Kitchen", kitchenSchema);

@@ -34,15 +34,22 @@ const orderSchema = new Schema(
       required: true,
       min: 0,
     },
-    status: {
-      type: Boolean,
-      default: null, // null = pending, true = accepted, false = rejected
-    },
-    rejectionNote: {
+    status: [
+        {
+        boolStatus: {
+                  type: Boolean,
+                    default: null, // null = pending, true = accepted, false = rejected
+
+        },
+         rejectionNote: {
       type: String,
       trim: true,
       default: "", 
-    },
+    }
+}
+
+],
+   
     estimatedTime: {
       type: String,
       trim: true,
