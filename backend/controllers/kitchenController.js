@@ -1,4 +1,4 @@
-import Kitchen from "../models/Kitchen.js";
+import Kitchen from "../models/kitchen.js";
 
 export const createKitchen = async (req, res) => {
   try {
