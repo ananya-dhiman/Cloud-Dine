@@ -9,5 +9,3 @@ build/
 *.log
 # IDE files (e.g., VS Code)
 .vscode/
-# Firebase service account key
-config/serviceAccountKey.json
