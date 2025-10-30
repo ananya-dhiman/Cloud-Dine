@@ -28,7 +28,7 @@ export const getAllKitchens = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-export const getKitchenById = async (req, res) => {
+export const  getKitchenById = async (req, res) => {
   try {
     const { kitchenId } = req.params;
     const kitchen = await Kitchen.findById(kitchenId);

@@ -9,3 +9,5 @@ build/
 *.log
 # IDE files (e.g., VS Code)
 .vscode/
+
+config/serviceAccountKey.json
