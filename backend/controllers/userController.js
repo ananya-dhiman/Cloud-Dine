@@ -44,7 +44,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         // Ensure role is valid and handle 'admin' role carefully
         role: role || 'user', 
         // Optional: Store the Firebase UID for cross-referencing
-        // firebaseUid: firebaseUid 
+        firebaseUid: firebaseUid 
     });
 
     if (newUser) {
@@ -58,3 +58,22 @@ export const registerUser = asyncHandler(async (req, res) => {
         throw new Error('Failed to create local user account.');
     }
 });
+
+export const verifyLogin = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    if (!idToken) return res.status(400).json({ error: 'Token is required' });
+
+    // Verify Firebase ID token
+    const decoded = await admin.auth().verifyIdToken(token);
+    const uid = decoded.uid;
+
+    const user = await User.findOne({ uid });
+    if (!user) return res.status(404).json({ error: 'User not found in database' });
+
+    res.status(200).json({ message: 'Login verified successfully', user });
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid or expired token', details: error.message });
+  }
+};
+

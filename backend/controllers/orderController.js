@@ -30,9 +30,10 @@ export const createOrder = async (req, res) => {
         return res.status(400).json({ message: "Missing required order fields: kitchen, dishes, or totalAmount." });
     }
 
-    // A real-world scenario requires security validation:
-    // 1. Check if kitchen exists and is active.
-    // 2. Recalculate totalAmount based on current dish prices (from Menu model) to prevent client-side fraud.
+        const findKitchen = await Kitchen.findById(kitchen);
+        if (!findKitchen) return res.status(404).json({ message: "Kitchen not found" });
+
+    
     
     try {
         const newOrder = new Order({

@@ -87,15 +87,15 @@
 //     </motion.div>
 //   );
 // }
+
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { initializeApp } from "firebase/app";
+import {auth,provider} from "../lib/firebase";  
 
 
-// Initialize Firebase once
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
 export default function AuthForm() {
   const [loading, setLoading] = useState(false);
@@ -118,10 +118,10 @@ export default function AuthForm() {
       }
 
       const token = await userCredential.user.getIdToken();
-      console.log("✅ Firebase Token:", token);
+      console.log("Firebase Token:", token);
       alert("Success! Token logged in console.");
     } catch (error) {
-      console.error("❌ Auth error:", error);
+      console.error("Auth error:", error);
       alert(error.message);
     } finally {
       setLoading(false);

@@ -1,7 +1,9 @@
-Verifciation
+Verification
 Accept-> button checks if all details are filled and pics by admin are added
 Reject-> Dont check anything, just delete the kitchen
 
 Order acceptance
 Accept-> Change status to accepted, notify user
 Reject-> Change status to rejected, notify user with rejection note
+
+Check kitchen add route with images

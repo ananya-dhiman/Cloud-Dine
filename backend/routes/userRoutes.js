@@ -1,40 +1,46 @@
-// routes/userRoutes.js
 import express from 'express';
-import { registerUser } from '../controllers/userController.js';
+import { registerUser, verifyLogin} from '../controllers/userController.js';
 import { protect, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // ------------------------------------------------------------------
-// Public/Registration Endpoint
-// Client calls this after successful Firebase sign-up/in (local or Google)
-// to create the MongoDB document.
+// POST /api/users/register
+// Public - After successful Firebase sign-up/in (email or Google)
+// Creates a MongoDB user document if it doesn’t already exist
 // ------------------------------------------------------------------
-router.post('/register', registerUser); 
+router.post('/register', registerUser);
+
+// ------------------------------------------------------------------
+// POST /api/users/login
+// Public - Client sends Firebase ID token to verify and log in
+// This doesn’t create new users; it validates token & returns profile
+// ------------------------------------------------------------------
+router.post('/login', verifyLogin);
 
 
 // ------------------------------------------------------------------
-// Protected Routes (Authentication & Role-Based Authorization)
+// GET /api/users/profile
+// Protected - Any logged-in user
 // ------------------------------------------------------------------
-
-// GET /api/users/profile - Example Protected Route
-// Access: Any logged-in user
 router.get('/profile', protect, (req, res) => {
-    // req.user contains the authenticated local User object
-    res.json({ message: 'Profile data retrieved.', user: req.user });
+  res.json({ message: 'Profile data retrieved.', user: req.user });
 });
 
-// GET /api/users/kitchen-data - Example Owner/Admin Route
-// Access: Users with role 'owner' or 'admin'
-router.get('/kitchen-data', protect, authorize(['owner', 'admin']), (req, res) => {
-    res.json({ message: `Access granted for ${req.user.role}.`, data: 'Sensitive kitchen orders data.' });
-});
-
-// GET /api/users/admin-panel - Example Admin-Only Route
-// Access: Users with role 'admin'
-router.get('/admin-panel', protect, authorize(['admin']), (req, res) => {
-    res.json({ message: 'Welcome to the Admin Panel.', data: 'Highest level system controls.' });
-});
-
+// ------------------------------------------------------------------
+// GET /api/users/kitchen-data
+// Protected - Only owner/admin roles
+// ------------------------------------------------------------------
+router.get(
+  '/kitchen-data',
+  protect,
+  authorize(['owner', 'admin']),
+  (req, res) => {
+    res.json({
+      message: `Access granted for ${req.user.role}.`,
+      data: 'Sensitive kitchen orders data.',
+    });
+  }
+);
 
 export default router;
