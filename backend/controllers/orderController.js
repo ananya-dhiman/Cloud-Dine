@@ -201,16 +201,24 @@ export const updateDeliveryStatus = async (req, res) => {
     }
 
     try {
-        const order = await Order.findById(orderId).populate('kitchen');
-
+        const order = await Order.findById(orderId);
+        
         if (!order) {
             return res.status(404).json({ message: "Order not found." });
         }
-
+       console.log("Order's Kitchen ID:", order);
         // Authorization Check
-        if (req.user.role !== 'admin' && !(await checkKitchenOwnership(order.kitchen._id, req.user._id))) {
-            return res.status(403).json({ message: "Not authorized to update this order's delivery status." });
-        }
+       if (req.user.role !== 'admin') {
+    if (!order.kitchen) {
+        return res.status(400).json({ order: order, message: "Kitchen reference not found for this order." });
+    }
+  
+    const ownsKitchen = await checkKitchenOwnership(order.kitchen._id, req.user._id);
+    if (!ownsKitchen) {
+        return res.status(403).json({ message: "Not authorized to update this order's delivery status." });
+    }
+}
+
 
         // Prevent updating delivery status if the order was rejected
         const lastStatus = order.status[order.status.length - 1];
