@@ -11,9 +11,56 @@
   } from "@/components/ui/breadcrumb";
   import CartItem from "../components/cart-item";
   import { useCart } from "../context/CartContext";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
   export default function CartPage() {
-    const { items, totalPrice, removeItem, formatCurrency } = useCart();
+    const { items, totalPrice, removeItem, formatCurrency,clearCart } = useCart();
+      const navigate = useNavigate();
+    const handlePlaceOrder = async () => {
+    if (!items.length) return alert("Cart is empty");
+
+    try {
+      const idToken = localStorage.getItem("idToken");
+
+    
+      const kitchenId = items[0].kitchenId;
+
+      const payload = {
+        kitchen: kitchenId,
+        dishes: items.map((item) => ({
+          dishId: item.dishId,
+          quantity: item.quantity,
+        })),
+        totalAmount: totalPrice,
+      };
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_API}/orders`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
+      
+
+      
+      clearCart();
+
+      navigate("/user/confirming");
+
+    } catch (err) {
+      console.error("Failed to place order:", err);
+      navigate("/main");
+      if (err.response) {
+        console.log("Server response:", err.response.data);
+      }
+      alert("Failed to place order. Please try again.");
+    }
+  };
+
 
     const [location, setLocation] = useState(null);
     const [error, setError] = useState("");
@@ -73,10 +120,10 @@
           <div className="mt-2 divide-y divide-border rounded-xl border border-border bg-card px-4">
             {items.length > 0 ? (
               items.map((item) => (
-                <CartItem
-                  key={item.id || item.name}
+               <CartItem
+                  key={item.dishId}
                   {...item}
-                  onRemove={() => removeItem(item.id)}
+                  onRemove={() => removeItem(item.dishId, item.kitchenId)}
                 />
               ))
             ) : (
@@ -135,14 +182,15 @@
 
         {/* Proceed Button */}
         <div className="flex justify-center bottom-4 mt-10">
-          <Link to="/payment">
+         
             <button
               type="button"
+              onClick={handlePlaceOrder}
               className="rounded-2xl bg-primary px-6 py-4 text-base font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               Proceed to Payment
             </button>
-          </Link>
+    
         </div>
       </main>
     );

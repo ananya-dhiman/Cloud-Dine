@@ -4,9 +4,11 @@ import {
   deleteKitchen,
   getAllKitchens,
   getKitchenById,
+  getKitchenByOwner
 } from "../controllers/kitchenController.js";
 import { protect, authorize } from "../middleware/auth.js";
 import { uploadMultiple } from "../middleware/upload.js";
+import { get } from "mongoose";
 
 const router = express.Router();
 
@@ -26,10 +28,10 @@ router.delete("/:kitchenId", protect, authorize(["owner", "admin"]), deleteKitch
 
 /**
  * @route   GET /api/kitchens
- * @desc    Admin can view all kitchens
+ * @desc    All kitchens 
  * @access  Private (admin only)
  */
-router.get("/", protect, authorize(["admin"]), getAllKitchens);
+router.get("/", protect, getAllKitchens);
 
 /**
  * @route   GET /api/kitchens/:kitchenId
@@ -37,5 +39,5 @@ router.get("/", protect, authorize(["admin"]), getAllKitchens);
  * @access  Private (all logged-in users)
  */
 router.get("/:kitchenId", protect, getKitchenById);
-
+router.get("/owner/:ownerId", protect, authorize(["owner"]),getKitchenByOwner);
 export default router;

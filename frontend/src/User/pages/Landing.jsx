@@ -1,8 +1,41 @@
 import SiteHeader from "../components/site-header"
 import RestaurantCard from "../components/restaurant-card"
 import { Card, CardContent } from "@/components/ui/card"
+import { useEffect, useState } from "react"
+import axios from "axios"
+import { useNavigate } from "react-router-dom";
 
 export default function LandingPage() {
+const navigate = useNavigate();
+
+  const [kitchens, setKitchens] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchKitchens = async () => {
+      try {
+        const idToken = localStorage.getItem("idToken"); 
+        if(idToken == null) {
+          navigate("/");
+          return;
+        }
+        const res = await axios.get( `${import.meta.env.VITE_API}/kitchens`, {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+        console.log("Fetched kitchens:", res.data);
+        setKitchens(res.data);
+
+      } catch (error) {
+        console.error("Error fetching kitchens:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchKitchens();
+  }, []);
   return (
     <main>
       <SiteHeader />
@@ -35,38 +68,30 @@ export default function LandingPage() {
       </section>
 
       {/* Featured Restaurants */}
-      <section id="restaurants" className="mx-auto max-w-6xl px-4 pb-10 pt-10">
-        <h2 className="text-xl font-semibold">Featured Restaurants</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <RestaurantCard
-            href="/kitchen/spice-merchant"
-            title="Spice Route"
-            subtitle="Authentic Indian"
-            imgSrc="/assorted-indian-dishes.jpg"
-            imgAlt="Assorted Indian dishes"
-          />
-          <RestaurantCard
-            href="/kitchen/spice-route"
-            title="The Gourmet Kitchen"
-            subtitle="Modern European"
-            imgSrc="/modern-european-plating.jpg"
-            imgAlt="Modern European plate"
-          />
-          <RestaurantCard
-            href="/kitchen/flavors-of-italy"
-            title="The Italian Job"
-            subtitle="Classic Italian"
-            imgSrc="/classic-italian-pizza.jpg"
-            imgAlt="Classic Italian pizza"
-          />
-          <RestaurantCard
-            href="#"
-            title="Green Bites"
-            subtitle="Healthy & Fresh"
-            imgSrc="/colorful-salad-bowl.jpg"
-            imgAlt="Healthy colorful salad"
-          />
-        </div>
+       <section id="restaurants" className="mx-auto max-w-6xl px-4 pb-10 pt-10">
+        <h2 className="text-xl font-semibold">Featured Kitchens</h2>
+        {loading ? (
+          <p className="mt-4 text-muted-foreground">Loading kitchens...</p>
+        ) : (
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {kitchens.slice(0, 4).map((kitchen) => (
+              <RestaurantCard
+                key={kitchen._id}
+                href={`/kitchen/${kitchen._id}`}
+                title={kitchen.name}
+                subtitle={kitchen.cuisineType.join(", ")}
+                imgSrc={
+                  kitchen.photos?.adminVerified?.[0]?.url
+                  ? `${import.meta.env.VITE_PHOTO_API}${kitchen.photos.adminVerified[0].url}`
+                  : kitchen.photos?.ownerSubmitted?.[0]?.url
+                  ? `${import.meta.env.VITE_PHOTO_API}${kitchen.photos.ownerSubmitted[0].url}`
+                  : "/images/default-restaurant.jpg"
+                }
+                imgAlt={kitchen.name}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Testimonials */}
@@ -75,14 +100,14 @@ export default function LandingPage() {
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           {[
             {
-              image:"/images/portrait-sophia.jpg",
-              name: "Sarah L.",
+              image:"/av/ma2.jpg",
+              name: "Sam K.",
               role: "Food Blogger",
               quote:
                 "The food from CloudDine is always fresh, delicious, and delivered right on time. Their selection is fantastic!",
             },
             {
-               image:"/images/portrait-sophia.jpg",
+               image:"/av/ma1.jpg",
               name: "Mike P.",
               role: "Busy Professional",
               quote:
@@ -90,7 +115,7 @@ export default function LandingPage() {
             },
             
             {
-               image:"/images/portrait-sophia.jpg",
+               image:"/av/fe.png",
               name: "Jessica T.",
               role: "Family Mom",
               quote:

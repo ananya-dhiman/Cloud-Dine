@@ -1,105 +1,17 @@
-
-// import { useState } from "react";
-// import { motion } from "framer-motion";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-// import { Link, useNavigate } from "react-router-dom"; // Add useNavigate
-
-// export default function AuthForm({ mode = "login", role = "user" }) {
-//   const [loading, setLoading] = useState(false);
-//   const navigate = useNavigate(); // initialize navigate
-//   const isSignup = mode === "signup";
-//   const roleLabel = role === "owner" ? "Kitchen Owner" : "User";
-//   const oppositeMode = isSignup ? "login" : "signup";
-//   const oppositeHref = role === "owner" ? `/owner/${oppositeMode}` : `/user/${oppositeMode}`;
-
-//   async function onSubmit(e) {
-//     e.preventDefault();
-//     setLoading(true);
-//     const formData = new FormData(e.currentTarget);
-//     const payload = Object.fromEntries(formData.entries());
-//     await new Promise((r) => setTimeout(r, 700));
-//     console.log("[v0] Auth submission", { mode, role, payload });
-//     setLoading(false);
-//     alert(`${isSignup ? "Signed up" : "Logged in"} as ${roleLabel}!`);
-
-//     // Navigate based on role
-//     if (role === "owner") {
-//       navigate("/owner");
-//     } else {
-//       navigate("/");
-//     }
-//   }
-
-//   return (
-//     <motion.div
-//       initial={{ opacity: 0, y: 12 }}
-//       animate={{ opacity: 1, y: 0 }}
-//       transition={{ duration: 0.35 }}
-//       className="w-full max-w-md mx-auto"
-//     >
-//       <header className="mb-6 text-center">
-//         <h1 className="text-3xl font-semibold text-balance">
-//           {isSignup ? "Create your account" : "Welcome back"}
-//         </h1>
-//         <p className="text-sm text-muted-foreground">
-//           {roleLabel} {isSignup ? "Sign Up" : "Login"}
-//         </p>
-//       </header>
-
-//       <form
-//         onSubmit={onSubmit}
-//         className="grid gap-4 bg-card text-card-foreground p-6 rounded-lg border"
-//       >
-//         {isSignup && (
-//           <div className="grid gap-2">
-//             <Label htmlFor="name">Full Name</Label>
-//             <Input id="name" name="name" placeholder="e.g. Priya Sharma" required />
-//           </div>
-//         )}
-//         <div className="grid gap-2">
-//           <Label htmlFor="email">Email</Label>
-//           <Input id="email" name="email" type="email" placeholder="you@example.com" required />
-//         </div>
-//         <div className="grid gap-2">
-//           <Label htmlFor="password">Password</Label>
-//           <Input id="password" name="password" type="password" placeholder="••••••••" required />
-//         </div>
-
-//         <Button type="submit" disabled={loading} className="mt-2 bg-primary text-primary-foreground hover:opacity-90">
-//           {loading ? (isSignup ? "Creating..." : "Signing in...") : isSignup ? "Sign Up" : "Login"}
-//         </Button>
-
-//         <p className="text-xs text-center text-muted-foreground">
-//           {isSignup ? "Already have an account? " : "Don't have an account? "}
-//           <Link to={oppositeHref} className="text-primary underline underline-offset-4">
-//             {isSignup ? "Login" : "Sign Up"}
-//           </Link>
-//         </p>
-//       </form>
-
-//       <div className="text-center mt-4">
-//         <Link to="/" className="text-sm text-primary underline underline-offset-4" aria-label="Back to role selection">
-//           ← Back to role selection
-//         </Link>
-//       </div>
-//     </motion.div>
-//   );
-// }
-
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { initializeApp } from "firebase/app";
-import {auth,provider} from "../lib/firebase";  
-
-
+import axios from "axios";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../lib/firebase";
+import { useNavigate } from "react-router-dom"; // ✅ import navigate hook
 
 export default function AuthForm() {
   const [loading, setLoading] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
+  const navigate = useNavigate();
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -117,12 +29,40 @@ export default function AuthForm() {
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
 
-      const token = await userCredential.user.getIdToken();
-      console.log("Firebase Token:", token);
-      alert("Success! Token logged in console.");
+      // ✅ Get Firebase ID token
+      const idToken = await userCredential.user.getIdToken();
+      console.log("Firebase Token:", idToken);
+      localStorage.setItem("idToken", idToken); 
+
+      // ✅ Backend endpoint
+      const endpoint = isSignup
+        ? `${import.meta.env.VITE_API}/users/register`
+        : `${import.meta.env.VITE_API}/users/login`;
+
+      const res = await axios.post(endpoint, { idToken });
+
+      console.log("Backend response:", res.data);
+
+      // ✅ On success, navigate to /main
+      if (res.status === 200 || res.status === 201) {
+        alert(res.data.message || "Success!");
+        console.log("Backend response:", res.data);
+    
+      
+      const role = res.data?.user?.role || "user"; 
+
+      if (role === "admin") {
+        navigate("/admin");
+      } else if (role === "owner") {
+        navigate("/owner");
+      } else {
+        navigate("/main");
+      }
+      }
+
     } catch (error) {
       console.error("Auth error:", error);
-      alert(error.message);
+      alert(error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
     }
@@ -132,20 +72,20 @@ export default function AuthForm() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="flex flex-col items-center justify-center min-h-screen bg-gray-950 text-white"
+      transition={{ duration: 0.4 }}
+      className="flex flex-col items-center justify-center min-h-screen bg-white text-gray-800 px-4"
     >
       <form
         onSubmit={onSubmit}
-        className="bg-gray-900 p-8 rounded-xl shadow-lg w-full max-w-sm border border-gray-800"
+        className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-200"
       >
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          {isSignup ? "Sign Up" : "Login"}
+        <h1 className="text-3xl font-bold mb-6 text-center text-green-700">
+          {isSignup ? "Create an Account" : "Welcome Back"}
         </h1>
 
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium mb-2">
-            Email
+        <div className="mb-5">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            Email Address
           </label>
           <input
             id="email"
@@ -153,12 +93,12 @@ export default function AuthForm() {
             type="email"
             placeholder="you@example.com"
             required
-            className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-white"
+            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
           />
         </div>
 
         <div className="mb-6">
-          <label htmlFor="password" className="block text-sm font-medium mb-2">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
             Password
           </label>
           <input
@@ -167,29 +107,39 @@ export default function AuthForm() {
             type="password"
             placeholder="••••••••"
             required
-            className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-white"
+            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2 rounded bg-green-600 hover:bg-green-700 disabled:opacity-60"
+          className="w-full py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors disabled:opacity-60"
         >
-          {loading ? (isSignup ? "Creating..." : "Signing in...") : isSignup ? "Sign Up" : "Login"}
+          {loading
+            ? isSignup
+              ? "Creating Account..."
+              : "Signing In..."
+            : isSignup
+            ? "Sign Up"
+            : "Login"}
         </button>
 
-        <p className="text-sm text-center mt-4">
+        <p className="text-sm text-center mt-6 text-gray-600">
           {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
             type="button"
             onClick={() => setIsSignup(!isSignup)}
-            className="text-green-400 hover:underline"
+            className="text-green-600 font-medium hover:underline"
           >
             {isSignup ? "Login" : "Sign Up"}
           </button>
         </p>
       </form>
+
+      <p className="mt-8 text-xs text-gray-400">
+        © {new Date().getFullYear()} Cloud Dine. All rights reserved.
+      </p>
     </motion.div>
   );
 }

@@ -11,6 +11,7 @@ import { CartProvider } from "./User/context/cartContext.jsx";
 import {OrderPlaced} from "./User/pages/OrderPlaced.jsx";
 import UserSignupPage from "./User/pages/Signup.jsx";
 import UserLoginPage from "./User/pages/Login.jsx";
+import LoadingConfrimation from './User/pages/LoadingConfirmation'
 
 //Owner
 import DashboardPage from './Owner/pages/dashboard.jsx'   
@@ -27,18 +28,19 @@ createRoot(document.getElementById('root')).render(
       <CartProvider>
     <BrowserRouter>
       <Routes>
-       <Route path="main" element ={<MainOnboardingPage/>}/>      
+       <Route path="/" element ={<MainOnboardingPage/>}/>      
         //User
-        <Route path="/" element={<LandingPage />}/>
+        <Route path="/main" element={<LandingPage />}/>
    
              <Route path="/kitchen" element={<Search />} />
 
-        <Route path="/kitchen/:slug" element={<KitchenPage />} />
+        <Route path="/kitchen/:kitchenId" element={<KitchenPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/order-placed" element={<OrderPlaced />} />
         <Route path="/user/signup" element={<UserSignupPage />} />
         <Route path="/user/login" element={<UserLoginPage />} />
+        <Route path="user/confirming" element={<LoadingConfrimation />} />
         
         //Owner
         <Route path="/owner" element={<DashboardPage />} />

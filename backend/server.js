@@ -11,11 +11,27 @@
     import kitchenRoutes from './routes/kitchenRoutes.js';
     import userRoutes from './routes/userRoutes.js';
     import menuRoutes from './routes/menuRoutes.js';
-    
+    import cors from "cors";
+
+    const allowedOrigins = [
+  "http://localhost:5173",   
+  "https://your-frontend-domain.com", 
+];
 
     app.use(express.json());
     app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-
+    app.use(
+    cors({
+       origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+        credentials: true, 
+    })
+    );
     mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('MongoDB connected successfully!'))
     .catch(err => console.error('MongoDB connection error:', err));

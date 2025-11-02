@@ -1,27 +1,30 @@
 import Kitchen from '../models/kitchen.js';
 import path from 'path';
 import fs from 'fs';
-
+import mongoose from 'mongoose';
 export const createKitchen = async (req, res) => {
   try {
     let ownerSubmittedPhotos = [];
-
+    console.log('Request Body:', req.files);
     if (req.files && req.files.length > 0) {
       console.log('Uploaded Files:', req.files);
       ownerSubmittedPhotos = req.files.map(file => {
         const uploadsIndex = file.path.indexOf(path.sep + 'uploads' + path.sep);
         const relativeUploadsPath = file.path.substring(uploadsIndex + 8);
-        const publicPath = '/static/' + relativeUploadsPath.replace(/\\/g, '/');
+        const publicPath = '/uploads/' + relativeUploadsPath.replace(/\\/g, '/');
         return { url: publicPath, localPath: file.path };
       });
     }
 
-    // Step 1: Prepare the data for MongoDB
-    const kitchenData = { ...req.body };
-    kitchenData.photos = {
-      ownerSubmitted: [],
-      adminVerified: [],
-    };
+    
+   const kitchenData = {
+  ...req.body,
+  owner: req.user._id,  
+  photos: {
+    ownerSubmitted: [],
+    adminVerified: [],
+  },
+};
 
     // Step 2: Save kitchen first (we need its _id for folder naming)
     const newKitchen = new Kitchen(kitchenData);
@@ -40,12 +43,13 @@ export const createKitchen = async (req, res) => {
       const tempFilePath = photo.localPath;
       const fileName = path.basename(tempFilePath);
       const newFilePath = path.join(permanentDir, fileName);
+   
 
       // Move file from temp → permanent
       fs.renameSync(tempFilePath, newFilePath);
 
-      // Construct new public URL
-      const newPublicURL = '/static/kitchens/' + `${kitchenId}/${fileName}`;
+      
+      const newPublicURL = '/uploads/kitchens/' + `${kitchenId}/${fileName}`;
       updatedPhotos.push({ url: newPublicURL });
     }
 
@@ -99,3 +103,28 @@ export const  getKitchenById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+export const getKitchenByOwner = async (req, res) => { 
+  try {
+    const { ownerId } = req.params;
+    
+ 
+    if (!mongoose.Types.ObjectId.isValid(ownerId)) {
+      return res.status(400).json({ error: 'Invalid owner ID format' });
+    }
+    
+    const kitchen = await Kitchen.findOne({ owner: ownerId });
+    console.log('Kitchen found:', kitchen);
+    
+    if (!kitchen) {
+      return res.status(404).json({ 
+        error: 'Kitchen not found',
+        searchedFor: ownerId 
+      });
+    }
+    
+    res.status(200).json(kitchen);
+  } catch (error) {
+    console.error('Error in getKitchenByOwner:', error);
+    res.status(500).json({ error: error.message });
+  }   
+}

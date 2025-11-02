@@ -56,7 +56,7 @@ export default function SimpleNav() {
             <Link
               to="/owner/orders"
               aria-label="Orders"
-              className="rounded-md p-2 hover:bg-muted"
+              className="rounded-md p-2 hover:bg-green"
             >
               <ShoppingBag className="h-5 w-5" />
               <span className="sr-only">Orders</span>
