@@ -3,6 +3,7 @@ import {
   addMenu,
   editMenu,
   getMenuByKitchen,
+  addSection
 } from "../controllers/menuController.js";
 import { protect, authorize } from "../middleware/auth.js";
 import { uploadMultiple } from "../middleware/upload.js";
@@ -17,5 +18,7 @@ router.put("/:kitchenId", protect, authorize(["owner"]), editMenu);
 
 // Anyone can view menu by kitchen
 router.get("/:kitchenId", getMenuByKitchen);
+
+router.post('/:kitchenId/sections',protect, authorize(["owner"]),addSection);
 
 export default router;

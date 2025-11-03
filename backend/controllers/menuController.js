@@ -97,4 +97,22 @@ export const getMenuByKitchen = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-    
+     
+export const addSection = async (req, res) => {
+  try {
+    const { kitchenId } = req.params;
+    const { title } = req.body;
+
+    const menu = await Menu.findOne({ kitchen: kitchenId });
+    if (!menu) return res.status(404).json({ message: "Menu not found" });
+
+    menu.sections.push({ title });
+    await menu.save();
+
+    res.status(200).json(menu);
+  } catch (error) {
+    console.error("Error adding section:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
