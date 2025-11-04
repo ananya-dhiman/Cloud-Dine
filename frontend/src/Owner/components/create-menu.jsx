@@ -1,17 +1,12 @@
 
-
-
-import { useState } from "react"
-import { Plus, Trash2, ChefHat, UtensilsCrossed } from "lucide-react"
+import { useState, useRef } from "react"
+import { Plus, Trash2, ChefHat, UtensilsCrossed, Upload, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import axios from "axios";
 
-
-export default function MenuCreator({ ownerId,kitchenId, onMenuCreated }) {
-
+export default function MenuCreator({ ownerId, kitchenId, onMenuCreated }) {
   const [sections, setSections] = useState([
     {
       title: "Starters",
@@ -19,6 +14,7 @@ export default function MenuCreator({ ownerId,kitchenId, onMenuCreated }) {
     }
   ])
   const [loading, setLoading] = useState(false)
+  const fileInputRefs = useRef({})
 
   const addSection = () => {
     setSections([...sections, { title: "", dishes: [] }])
@@ -40,7 +36,8 @@ export default function MenuCreator({ ownerId,kitchenId, onMenuCreated }) {
       name: "",
       description: "",
       price: "",
-      image: "",
+      imageFile: null,
+      imagePreview: null,
       isAvailable: true
     })
     setSections(updated)
@@ -58,67 +55,92 @@ export default function MenuCreator({ ownerId,kitchenId, onMenuCreated }) {
     setSections(updated)
   }
 
-  
-const handleSubmit = async () => {
-  setLoading(true);
+  const handleImageSelect = (sectionIndex, dishIndex, file) => {
+    if (file) {
+      const updated = [...sections]
+      updated[sectionIndex].dishes[dishIndex].imageFile = file
+      updated[sectionIndex].dishes[dishIndex].imagePreview = URL.createObjectURL(file)
+      setSections(updated)
+    }
+  }
+
+  const removeImage = (sectionIndex, dishIndex) => {
+    const updated = [...sections]
+    if (updated[sectionIndex].dishes[dishIndex].imagePreview) {
+      URL.revokeObjectURL(updated[sectionIndex].dishes[dishIndex].imagePreview)
+    }
+    updated[sectionIndex].dishes[dishIndex].imageFile = null
+    updated[sectionIndex].dishes[dishIndex].imagePreview = null
+    setSections(updated)
+  }
+
+  const handleSubmit = async () => {
+  setLoading(true)
   try {
-    const token = localStorage.getItem("idToken");
+    const token = localStorage.getItem("idToken")
 
     if (!kitchenId || !ownerId) {
-      alert("Missing kitchen or owner ID. Please refresh the page.");
-      return;
+      alert("Missing kitchen or owner ID. Please refresh the page.")
+      return
     }
 
-    const menuData = {
-      kitchen: kitchenId,
-      lastUpdatedBy: ownerId,
-      sections: sections.map(section => ({
-        title: section.title,
-        dishes: section.dishes.map(dish => ({
+    // Create FormData to support files
+    const formData = new FormData()
+    formData.append("kitchen", kitchenId)
+    formData.append("lastUpdatedBy", ownerId)
+
+    // Build sections but track file indexes
+    const cleanSections = sections.map((section, sectionIndex) => ({
+      title: section.title,
+      dishes: section.dishes.map((dish, dishIndex) => {
+        // If dish has an image file, append it to FormData
+        if (dish.imageFile) {
+          formData.append("photos", dish.imageFile) // same field your backend Cloudinary middleware expects
+        }
+
+        return {
           name: dish.name,
           description: dish.description,
           price: parseFloat(dish.price),
-          image: dish.image,
           isAvailable: dish.isAvailable,
-        })),
-      })),
-    };
+          // The backend will replace this with the uploaded Cloudinary URL
+          image: dish.imageFile ? null : "/images/logo.png"
+        }
+      })
+    }))
 
-    console.log("Submitting menuData:", menuData);
+    // Append JSON structure as a string
+    formData.append("sections", JSON.stringify(cleanSections))
 
-    const res = await axios.post(
-      `${import.meta.env.VITE_API}/menus`,
-      menuData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    console.log("Submitting FormData:", cleanSections)
 
-    console.log("Menu creation response:", res.status, res.data);
+    const response = await fetch(`${import.meta.env.VITE_API}/menus`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // ❌ Don’t set Content-Type manually! Browser sets multipart boundary automatically
+      },
+      body: formData,
+    })
 
-    if (onMenuCreated) onMenuCreated(res.data);
-  } catch (err) {
-    console.error("Failed to create menu:", err);
-
-    if (err.response) {
-      // Server responded with a status other than 2xx
-      alert(`Server Error: ${err.response.data.message || err.response.statusText}`);
-      console.log("Response Data:", err.response.data);
-    } else if (err.request) {
-      // No response from server
-      alert("No response from server. Check your backend connection.");
-      console.log("Request Data:", err.request);
-    } else {
-      // Something else went wrong
-      alert("Error: " + err.message);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.message || "Failed to create menu")
     }
+
+    const data = await response.json()
+    console.log("Menu created:", data)
+
+    alert("Menu created successfully!")
+    onMenuCreated?.(data)
+  } catch (err) {
+    console.error("Menu creation failed:", err)
+    alert(`Error: ${err.message}`)
   } finally {
-    setLoading(false);
+    setLoading(false)
   }
-};
+}
+
 
 
   return (
@@ -209,14 +231,66 @@ const handleSubmit = async () => {
                         />
                       </div>
 
+                      {/* Image Upload */}
                       <div className="space-y-2 md:col-span-2">
-                        <Label className="text-sm font-medium">Image URL</Label>
-                        <Input
-                          placeholder="https://example.com/image.jpg"
-                          value={dish.image}
-                          onChange={(e) => updateDish(sectionIndex, dishIndex, "image", e.target.value)}
-                          className="border-gray-300"
-                        />
+                        <Label className="text-sm font-medium">Dish Image (Optional)</Label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                          {dish.imagePreview ? (
+                            <div className="relative">
+                              <img
+                                src={dish.imagePreview}
+                                alt="Dish preview"
+                                className="w-full h-48 object-cover rounded-lg"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                onClick={() => removeImage(sectionIndex, dishIndex)}
+                                className="absolute top-2 right-2"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <Upload className="w-8 h-8 text-gray-400" />
+                              <p className="text-sm text-gray-500">
+                                Upload dish image or default logo will be used
+                              </p>
+                              <input
+                                ref={(el) => {
+                                  if (!fileInputRefs.current[sectionIndex]) {
+                                    fileInputRefs.current[sectionIndex] = {}
+                                  }
+                                  fileInputRefs.current[sectionIndex][dishIndex] = el
+                                }}
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                className="hidden"
+                                onChange={(e) => {
+                                  if (e.target.files?.[0]) {
+                                    handleImageSelect(sectionIndex, dishIndex, e.target.files[0])
+                                  }
+                                }}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  fileInputRefs.current[sectionIndex]?.[dishIndex]?.click()
+                                }}
+                                className="border-red-300 text-red-600 hover:bg-red-50"
+                              >
+                                <Upload className="w-4 h-4 mr-2" />
+                                Choose Image
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          Max 5MB. Supported formats: JPEG, PNG, WEBP
+                        </p>
                       </div>
                     </div>
                   </div>

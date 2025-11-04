@@ -6,13 +6,19 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../lib/firebase";
-import { useNavigate } from "react-router-dom"; // ✅ import navigate hook
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function AuthForm() {
   const [loading, setLoading] = useState(false);
-  const [isSignup, setIsSignup] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // 🔹 Derive mode and role from URL
+  const path = location.pathname.toLowerCase();
+  const isSignup = path.includes("signup");
+  const role = path.includes("owner") ? "owner" : "user";
+
+  // 🔹 Submit handler
   async function onSubmit(e) {
     e.preventDefault();
     setLoading(true);
@@ -23,42 +29,54 @@ export default function AuthForm() {
 
     try {
       let userCredential;
+
+      // 1️⃣ Firebase auth (signup or login)
       if (isSignup) {
         userCredential = await createUserWithEmailAndPassword(auth, email, password);
       } else {
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
 
-      // ✅ Get Firebase ID token
+      // 2️⃣ Get Firebase ID token
       const idToken = await userCredential.user.getIdToken();
-      console.log("Firebase Token:", idToken);
-      localStorage.setItem("idToken", idToken); 
+      localStorage.setItem("idToken", idToken);
 
-      // ✅ Backend endpoint
-      const endpoint = isSignup
-        ? `${import.meta.env.VITE_API}/users/register`
-        : `${import.meta.env.VITE_API}/users/login`;
+      // 3️⃣ Backend endpoints
+      const API = import.meta.env.VITE_API;
+      const loginEndpoint = `${API}/users/login`;
+      const registerEndpoint = `${API}/users/register`;
 
-      const res = await axios.post(endpoint, { idToken });
+      let res;
+      try {
+        // Try verifying local user first
+        res = await axios.post(loginEndpoint, { idToken });
+      } catch (err) {
+        // If local user doesn't exist, create it automatically
+        if (
+          err.response?.status === 302 ||
+          err.response?.data?.redirect === "/register" ||
+          err.response?.data?.needsRegistration
+        ) {
+          console.log("User not found locally — registering...");
+          res = await axios.post(registerEndpoint, {
+            idToken,
+            name: email.split("@")[0],
+            role,
+          });
+        } else {
+          throw err; // Re-throw unexpected errors
+        }
+      }
 
       console.log("Backend response:", res.data);
 
-      // ✅ On success, navigate to /main
-      if (res.status === 200 || res.status === 201) {
-        alert(res.data.message || "Success!");
-        console.log("Backend response:", res.data);
-    
-      
-      const role = res.data?.user?.role || "user"; 
+      // 4️⃣ On success — navigate by role
+      alert(res.data.message || "Success!");
+      const userRole = res.data?.user?.role || role;
 
-      if (role === "admin") {
-        navigate("/admin");
-      } else if (role === "owner") {
-        navigate("/owner");
-      } else {
-        navigate("/main");
-      }
-      }
+      if (userRole === "admin") navigate("/admin");
+      else if (userRole === "owner") navigate("/owner");
+      else navigate("/main");
 
     } catch (error) {
       console.error("Auth error:", error);
@@ -68,6 +86,7 @@ export default function AuthForm() {
     }
   }
 
+  // 🔹 UI
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -80,11 +99,16 @@ export default function AuthForm() {
         className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-200"
       >
         <h1 className="text-3xl font-bold mb-6 text-center text-green-700">
-          {isSignup ? "Create an Account" : "Welcome Back"}
+          {isSignup
+            ? `Create a ${role === "owner" ? "Kitchen Owner" : "User"} Account`
+            : `Welcome Back, ${role === "owner" ? "Chef" : "User"}`}
         </h1>
 
         <div className="mb-5">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Email Address
           </label>
           <input
@@ -98,7 +122,10 @@ export default function AuthForm() {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Password
           </label>
           <input
@@ -129,7 +156,9 @@ export default function AuthForm() {
           {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
             type="button"
-            onClick={() => setIsSignup(!isSignup)}
+            onClick={() =>
+              navigate(isSignup ? `/${role}/login` : `/${role}/signup`)
+            }
             className="text-green-600 font-medium hover:underline"
           >
             {isSignup ? "Login" : "Sign Up"}

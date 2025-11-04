@@ -11,7 +11,7 @@ import { CartProvider } from "./User/context/cartContext.jsx";
 import {OrderPlaced} from "./User/pages/OrderPlaced.jsx";
 import UserSignupPage from "./User/pages/Signup.jsx";
 import UserLoginPage from "./User/pages/Login.jsx";
-import LoadingConfrimation from './User/pages/LoadingConfirmation'
+import LoadingConfirmation from './User/pages/LoadingConfirmation'
 
 //Owner
 import DashboardPage from './Owner/pages/dashboard.jsx'   
@@ -20,6 +20,7 @@ import MenuManagementPage from './Owner/pages/menu.jsx'
 import OnboardingPage from './Owner/pages/onboarding'
 import OwnerLoginPage from './Owner/pages/login.jsx'
 import OwnerSignupPage from './Owner/pages/signup.jsx'
+import OrderStatusPage from './Owner/pages/orderStatus'
 
 import MainOnboardingPage from './Common/Onboarding.jsx'
 
@@ -40,11 +41,12 @@ createRoot(document.getElementById('root')).render(
         <Route path="/order-placed" element={<OrderPlaced />} />
         <Route path="/user/signup" element={<UserSignupPage />} />
         <Route path="/user/login" element={<UserLoginPage />} />
-        <Route path="user/confirming" element={<LoadingConfrimation />} />
+        <Route path="/user/confirming" element={<LoadingConfirmation />} />
         
         //Owner
         <Route path="/owner" element={<DashboardPage />} />
         <Route path="/owner/orders" element={<OrdersPage />} />
+        <Route path="/owner/orders/:orderId" element={<OrderStatusPage/>}/>
         <Route path="/owner/menu" element={< MenuManagementPage/>} />
         <Route path="/owner/onboarding" element={<OnboardingPage />} />
         <Route path="/owner/signup" element={<OwnerSignupPage />} />

@@ -5,6 +5,7 @@ import {
   createOrder, 
   getOrderDetails, 
   getOrdersForKitchen, 
+  getOrdersByUser,
   updateOrderStatus, 
   updateDeliveryStatus 
 } from '../controllers/orderController.js';
@@ -17,6 +18,7 @@ const router = express.Router();
 // Create a new order
 router.post('/', protect, createOrder);
 
+router.get("/user/:userId", protect, getOrdersByUser);
 // Get order details by ID
 router.get('/:orderId', protect, getOrderDetails);
 
@@ -27,10 +29,13 @@ router.get('/:orderId', protect, getOrderDetails);
 // Get all orders for a particular kitchen
 router.get('/kitchen/:kitchenId', protect, authorize(["owner", "admin"]), getOrdersForKitchen);
 
+router.get("/user/:userId", protect, getOrdersByUser);
 // Update order status (Accept/Reject)
 router.patch('/:orderId/status', protect, authorize(["owner", "admin"]), updateOrderStatus);
 
 // Update delivery status
 router.patch('/:orderId/delivery', protect, authorize(["owner", "admin"]), updateDeliveryStatus);
+
+
 
 export default router;

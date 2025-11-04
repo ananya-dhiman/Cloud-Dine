@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
 
+
 export default function LandingPage() {
 const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ const navigate = useNavigate();
           navigate("/");
           return;
         }
+        console.log("Firebase Token",idToken)
         const res = await axios.get( `${import.meta.env.VITE_API}/kitchens`, {
           headers: {
             Authorization: `Bearer ${idToken}`,
@@ -28,6 +30,9 @@ const navigate = useNavigate();
         setKitchens(res.data);
 
       } catch (error) {
+        if(error.status==401){
+          navigate("/");
+        }
         console.error("Error fetching kitchens:", error);
       } finally {
         setLoading(false);
@@ -80,13 +85,11 @@ const navigate = useNavigate();
                 href={`/kitchen/${kitchen._id}`}
                 title={kitchen.name}
                 subtitle={kitchen.cuisineType.join(", ")}
-                imgSrc={
-                  kitchen.photos?.adminVerified?.[0]?.url
-                  ? `${import.meta.env.VITE_PHOTO_API}${kitchen.photos.adminVerified[0].url}`
-                  : kitchen.photos?.ownerSubmitted?.[0]?.url
-                  ? `${import.meta.env.VITE_PHOTO_API}${kitchen.photos.ownerSubmitted[0].url}`
-                  : "/images/default-restaurant.jpg"
-                }
+                          imgSrc={
+              kitchen.photos?.adminVerified?.[0]?.url
+              || kitchen.photos?.ownerSubmitted?.[0]?.url
+              || "/images/default-restaurant.jpg"
+            }
                 imgAlt={kitchen.name}
               />
             ))}

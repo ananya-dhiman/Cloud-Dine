@@ -13,10 +13,11 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import axios from "axios"
+import { useNavigate } from "react-router-dom"
 import MenuCreator from "../components/create-menu"
 
 export default function MenuManagementPage() {
- 
+  const navigate=useNavigate()
   const [menuData, setMenuData] = useState(null)
   const [ownerId, setOwnerId] = useState(null);
 const [newSectionName, setNewSectionName] = useState("");
@@ -28,67 +29,79 @@ const [newDish, setNewDish] = useState({
   name: "",
   price: "",
   description: "",
-  image: "",
-  isAvailable: true
-})
+  imageFile: null,
+  isAvailable: true,
+});
+
 // ------------------------
 // Add Dish (axios version)
 // ------------------------
+// Replace your addDish function with this:
+
 const addDish = async () => {
   if (!newDish.section || !newDish.name || !newDish.price) {
     alert("Please fill in all required fields.");
     return;
   }
 
+  if (!newDish.imageFile) {
+    alert("Please upload an image for the dish.");
+    return;
+  }
+
   try {
     const token = localStorage.getItem("idToken");
-
-    // Clone and update menuData locally first
-    const updatedMenu = { ...menuData };
-
-    const sectionIndex = updatedMenu.sections.findIndex(
-      (s) => s._id === newDish.section || s.title === newDish.section
-    );
-
-    if (sectionIndex === -1) {
-      alert("Invalid section selected.");
+    if (!token) {
+      alert("Not authenticated");
       return;
     }
 
-    const newDishData = {
-      name: newDish.name,
-      description: newDish.description,
-      price: parseFloat(newDish.price),
-      image: newDish.image,
-      isAvailable: newDish.isAvailable,
-    };
+    const formData = new FormData();
+    formData.append("name", newDish.name);
+    formData.append("description", newDish.description);
+    formData.append("price", newDish.price);
+    formData.append("isAvailable", newDish.isAvailable);
+    formData.append("sectionId", newDish.section); 
+    formData.append("photos", newDish.imageFile); // Match multer field name
 
-    // Update locally
-    updatedMenu.sections[sectionIndex].dishes.push(newDishData);
-    setMenuData(updatedMenu);
-    setOpen(false);
-    console.log(menuData);
+    console.log("📤 Sending dish data:");
+    for (let [key, value] of formData.entries()) {
+      console.log(`  ${key}:`, value);
+    }
 
-    // Send full updated menu to backend
-    const res = await axios.put(
-      `${import.meta.env.VITE_API}/menus/${kitchenId}`,
-      updatedMenu,
+    // Use the new endpoint: POST /menus/:kitchenId/dishes
+    const res = await axios.post(
+      `${import.meta.env.VITE_API}/menus/${kitchenId}/dishes`,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          // Don't set Content-Type - let browser set it with boundary
         },
       }
     );
 
-    console.log("Menu updated successfully:", res.data);
-    setMenuData(res.data); 
+    console.log("✅ Dish added:", res.data);
+    setMenuData(res.data); // Backend returns updated menu
+    
+    // Reset form
+    setNewDish({
+      section: "",
+      name: "",
+      price: "",
+      description: "",
+      imageFile: null,
+      isAvailable: true,
+    });
+    
+    setOpen(false);
+    alert("Dish added successfully!");
   } catch (err) {
-    console.error("Failed to add dish:", err);
+    console.error("❌ Failed to add dish:", err);
+    console.error("❌ Error response:", err.response?.data);
     alert(err.response?.data?.message || "Failed to add dish");
   }
 };
-
 
 
 // ------------------------
@@ -150,6 +163,7 @@ const addSection = async (sectionName) => {
 
       if (!getOwnerId) {
         console.error("Owner ID not found in /profile response");
+        navigate("/");
         return;
       }
 
@@ -181,8 +195,10 @@ const addSection = async (sectionName) => {
     } catch (error) {
       if (error.response?.status === 404) {
     console.warn("Menu not found. Allow user to create menu.");
+        
       } else {
     console.error("Unexpected menu fetch error:", error);
+    navigate("/");
   }
     } finally {
       setLoading(false);
@@ -196,6 +212,8 @@ const addSection = async (sectionName) => {
   if (loading) return <p className="mt-4 text-muted-foreground px-4">Loading...</p>
 
   if (!menuData) {
+    console.log(ownerId)
+    console.log(kitchenId)
   return (
   <>
 
@@ -282,12 +300,15 @@ const addSection = async (sectionName) => {
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-semibold text-gray-700">Image URL</Label>
-          <Input
-            className="border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            placeholder="https://example.com/image.jpg"
-            onChange={(e) => setNewDish({ ...newDish, image: e.target.value })}
-          />
+   <Label className="text-sm font-semibold text-gray-700">Upload Image *</Label>
+<Input
+  type="file"
+  accept="image/*"
+  className="border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+  onChange={(e) => setNewDish({ ...newDish, imageFile: e.target.files[0] })}
+/>
+
+
         </div>
 
         <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">

@@ -1,20 +1,31 @@
 import express from "express";
 import {
   addMenu,
-  editMenu,
+  addDish,
   getMenuByKitchen,
+  getDishById,
   addSection
 } from "../controllers/menuController.js";
 import { protect, authorize } from "../middleware/auth.js";
-import { uploadMultiple } from "../middleware/upload.js";
+
+import uploadMiddleware from "../middleware/upload.js";
 
 const router = express.Router();
 
+
+router.get("/dish/:dishId", protect, getDishById);
+
 // Owner can add a new menu
-router.post("/", protect, authorize(["owner"]), uploadMultiple,addMenu);
+router.post("/", protect, authorize(["owner"]), uploadMiddleware,addMenu);
 
 // Owner can edit an existing menu
-router.put("/:kitchenId", protect, authorize(["owner"]), editMenu);
+router.post(
+  "/:kitchenId/dishes", 
+  protect, 
+  authorize(["owner"]), 
+  uploadMiddleware,  
+  addDish
+);
 
 // Anyone can view menu by kitchen
 router.get("/:kitchenId", getMenuByKitchen);

@@ -67,12 +67,11 @@ export const verifyLogin = async (req, res) => {
 
     if (!user) {
       console.log("User not found, redirecting to registration...");
-      return res
-        .status(302)
-        .json({ redirect: "/register", message: "User not found. Please register first." });
+      return res.status(200).json({ needsRegistration: true });
+
     }
 
-    console.log("✅ User found:", user.email);
+    console.log("User found:", user.email);
     res.status(200).json({ message: "Login verified successfully", user });
 
   } catch (error) {

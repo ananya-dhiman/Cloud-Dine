@@ -242,3 +242,18 @@ export const updateDeliveryStatus = async (req, res) => {
         res.status(500).json({ message: "Server error updating delivery status.", error: error.message });
     }
 };
+
+export const getOrdersByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const orders = await Order.find({ user: userId })
+      .populate("kitchen", "name address") // only return useful fields
+      .populate("dishes.dishId", "name price"); // populate dish details
+
+    return res.status(200).json(orders);
+  } catch (error) {
+    console.error("Error fetching user's orders:", error);
+    res.status(500).json({ message: "Server error fetching orders" });
+  }
+};

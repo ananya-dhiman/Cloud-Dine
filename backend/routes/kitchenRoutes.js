@@ -7,8 +7,9 @@ import {
   getKitchenByOwner
 } from "../controllers/kitchenController.js";
 import { protect, authorize } from "../middleware/auth.js";
-import { uploadMultiple } from "../middleware/upload.js";
+
 import { get } from "mongoose";
+import uploadMiddleware from "../middleware/upload.js";
 
 const router = express.Router();
 
@@ -17,7 +18,13 @@ const router = express.Router();
  * @desc    Owner can add a new kitchen (with image upload)
  * @access  Private (owner only)
  */
-router.post("/", protect, authorize(["owner"]), uploadMultiple, createKitchen);
+router.post(
+  "/",
+  protect,
+  authorize(["owner"]),
+  uploadMiddleware,
+  createKitchen
+);
 
 /**
  * @route   DELETE /api/kitchens/:kitchenId

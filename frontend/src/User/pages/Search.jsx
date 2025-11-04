@@ -193,12 +193,11 @@ export default function SearchPage() {
                   title={kitchen.name}
                   description={kitchen.notes || "No description available"}
                   image={
-                     kitchen.photos?.adminVerified?.[0]?.url
-                  ? `${import.meta.env.VITE_PHOTO_API}${kitchen.photos.adminVerified[0].url}`
-                  : kitchen.photos?.ownerSubmitted?.[0]?.url
-                  ? `${import.meta.env.VITE_PHOTO_API}${kitchen.photos.ownerSubmitted[0].url}`
-                  : "/images/default-restaurant.jpg"
-                  }
+                          kitchen.photos?.adminVerified?.[0]?.url ||
+                          kitchen.photos?.ownerSubmitted?.[0]?.url ||
+                          "/images/default-restaurant.jpg"
+                        }
+
                 />
               ))}
             </div>

@@ -1,7 +1,10 @@
-Fix add section in menu (First test in backend)
+Fixed section in menu
+
 Add order connect in owner 
 Reject/accept order
 
 Start User route connection after order confirmation
 
 Admin UI
+
+Fix add image in dish in menu

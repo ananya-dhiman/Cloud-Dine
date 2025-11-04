@@ -56,6 +56,7 @@ import { useNavigate } from "react-router-dom";
       navigate("/main");
       if (err.response) {
         console.log("Server response:", err.response.data);
+        
       }
       alert("Failed to place order. Please try again.");
     }
