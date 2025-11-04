@@ -433,7 +433,7 @@ export default function OnboardingForm() {
       console.log("❌ Error data:", err.response?.data);
       
       if (err.response?.status === 404) {
-        console.log("ℹ️ Kitchen not found (404) - this is normal for new users");
+        console.log("Kitchen not found (404) - this is normal for new users");
       }
     }
   };
@@ -530,7 +530,7 @@ photos.forEach((file) => {
       alert("Kitchen & images uploaded successfully");
       console.log("Created:", res.data);
     } catch (err) {
-      console.error("Whats the error ughhhhhhhhhhhhhhhhhh",err);
+      console.error("Error",err);
       alert("Upload failed");
     }
   }
