@@ -72,16 +72,7 @@ export default function SimpleNav() {
               <span className="sr-only">Edit Form</span>
             </Link>
           </li>
-          <li className="pl-1">
-            <Link
-              to="/profile"
-              aria-label="Profile"
-              className="rounded-md p-2 hover:bg-muted"
-            >
-              <CircleUser className="h-5 w-5" />
-              <span className="sr-only">Profile</span>
-            </Link>
-          </li>
+        
         </ul>
       </nav>
     </header>
