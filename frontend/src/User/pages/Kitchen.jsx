@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ReviewCard from "../components/review-card";
 import { RatingBar } from "../components/rating-bar";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/CartContext.jsx";
 import SiteHeader from "../components/site-header";
 import { ImageCarousel } from "../components/image-carousel.jsx";
 import axios from "axios";

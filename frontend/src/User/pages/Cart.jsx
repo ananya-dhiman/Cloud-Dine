@@ -10,7 +10,7 @@
     BreadcrumbSeparator,
   } from "@/components/ui/breadcrumb";
   import CartItem from "../components/cart-item";
-  import { useCart } from "../context/CartContext";
+  import { useCart } from "../context/CartContext.jsx";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
