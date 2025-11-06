@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../context/cartContext.jsx";
+import { useCart } from "../context/CartContext.jsx";
 
 export default function CheckoutPage() {
   const navigate = useNavigate();

@@ -7,7 +7,7 @@ import KitchenPage from './User/pages/Kitchen.jsx'
 import Search from './User/pages/Search.jsx' 
 import CartPage from './User/pages/Cart.jsx'
 import PaymentPage from './User/pages/Payment.jsx'
-import { CartProvider } from "./User/context/cartContext.jsx";
+import { CartProvider } from "./User/context/CartContext,jsx";
 import {OrderPlaced} from "./User/pages/OrderPlaced.jsx";
 import UserSignupPage from "./User/pages/Signup.jsx";
 import UserLoginPage from "./User/pages/Login.jsx";

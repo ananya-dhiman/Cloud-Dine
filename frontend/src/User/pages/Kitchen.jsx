@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ReviewCard from "../components/review-card";
 import { RatingBar } from "../components/rating-bar";
-import { useCart } from "../context/CartContext.jsx";
+import { useCart } from "../context/CartContext";
 import SiteHeader from "../components/site-header";
 import { ImageCarousel } from "../components/image-carousel.jsx";
 import axios from "axios";
@@ -51,7 +51,6 @@ export default function KitchenPage() {
         console.log("Menu Items:", menuData);
         setMenu(menuData);
 
-        // ✅ Fetch reviews
         const reviewsRes = await axios.get(
           `${import.meta.env.VITE_API}/reviews/${kitchenId}`,
           {
@@ -194,7 +193,7 @@ export default function KitchenPage() {
           </div>
         </section>
 
-        {/* ✅ Ratings & Reviews */}
+
         <section className="pt-12">
           <h2 className="text-lg font-semibold">Ratings & Reviews</h2>
           {reviews.length === 0 ? (
