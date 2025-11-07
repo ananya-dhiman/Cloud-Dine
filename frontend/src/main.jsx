@@ -23,7 +23,7 @@ import OwnerSignupPage from './Owner/pages/signup.jsx'
 import OrderStatusPage from './Owner/pages/orderStatus'
 
 import MainOnboardingPage from './Common/Onboarding.jsx'
-
+//Frontend deployed
 createRoot(document.getElementById('root')).render(
   <StrictMode>
       <CartProvider>
