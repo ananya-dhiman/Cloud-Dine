@@ -15,7 +15,7 @@
 
     const allowedOrigins = [
   "http://localhost:5173",   
-  "https://your-frontend-domain.com", 
+  "https://cloud-dine.vercel.app", 
 ];
 
     app.use(express.json());
