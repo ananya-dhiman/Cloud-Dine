@@ -14,8 +14,10 @@
     import cors from "cors";
 
     const allowedOrigins = [
-  
-  "https://cloud-dine.vercel.app", 
+                  // final domain
+  "https://cloud-dine-x31v.vercel.app",            // backend domain (self)
+  "https://cloud-dine-h0w41a840-dhimanananya1901-6638s-projects.vercel.app",
+  "https://cloud-dine.vercel.app"
 ];
 
     app.use(express.json());
